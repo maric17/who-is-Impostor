@@ -1,69 +1,56 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useGame } from "@/context/GameContext";
+import { SetupScreen } from "@/components/SetupScreen";
+import { PassScreen, RevealScreen } from "@/components/RoleScreens";
+import { DiscussionScreen, VotingScreen, ResultsScreen, EliminationRevealScreen } from "@/components/GameScreens";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  const { state } = useGame();
+
+  // Prevent hydration mismatch for localStorage
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-color)' }} />;
+  }
+
+  const renderScreen = () => {
+    switch (state.status) {
+      case "setup":
+        return <SetupScreen />;
+      case "pass":
+        return <PassScreen />;
+      case "reveal":
+        return <RevealScreen />;
+      case "discussion":
+        return <DiscussionScreen />;
+      case "voting":
+        return <VotingScreen />;
+      case "elimination_reveal":
+        return <EliminationRevealScreen />;
+      case "results":
+        return <ResultsScreen />;
+      default:
+        return <SetupScreen />;
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="container">
+      <header style={{ padding: '20px 0', textAlign: 'center' }}>
+        <h1 style={{ fontSize: 36, fontWeight: 900, textTransform: 'uppercase', letterSpacing: -1.5 }}>
+          WHO<span style={{ color: 'var(--primary)' }}>?</span>
+        </h1>
+      </header>
+      
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {renderScreen()}
+      </div>
+    </main>
   );
 }
