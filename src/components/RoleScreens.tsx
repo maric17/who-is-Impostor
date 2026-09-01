@@ -13,7 +13,11 @@ export function PassScreen() {
     <div className="animate-fade-in" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', padding: '40px 20px' }}>
       <div style={{ fontSize: 64, marginBottom: 20 }}>📱</div>
       <h2 style={{ fontSize: 24, marginBottom: 10 }}>Pass the device to</h2>
-      <h1 style={{ fontSize: 36, color: 'var(--primary)', marginBottom: 40 }}>{currentPlayer.name}</h1>
+      <h1 style={{ fontSize: 36, marginBottom: 40 }}>
+        <span style={{ backgroundColor: 'var(--primary)', color: '#000', padding: '4px 16px', borderRadius: '12px', display: 'inline-block' }}>
+          {currentPlayer.name}
+        </span>
+      </h1>
       <p style={{ color: 'var(--text-secondary)', marginBottom: 40 }}>
         Make sure no one else is looking!
       </p>
@@ -86,8 +90,10 @@ export function RevealScreen() {
           ) : (
             <div style={{ margin: '30px 0' }}>
               <p style={{ fontSize: 18, color: 'var(--text-secondary)', marginBottom: 5 }}>The word is</p>
-              <h1 style={{ fontSize: 42, color: 'var(--primary)', fontWeight: 900 }}>
-                {state.round.word}
+              <h1 style={{ fontSize: 42, fontWeight: 900 }}>
+                <span style={{ backgroundColor: 'var(--primary)', color: '#000', padding: '4px 16px', borderRadius: '12px', display: 'inline-block' }}>
+                  {state.round.word}
+                </span>
               </h1>
             </div>
           )}

@@ -131,7 +131,11 @@ export function ResultsScreen() {
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
         <div style={{ fontSize: 64, marginBottom: 10 }}>🎭</div>
         <h2 style={{ fontSize: 28, marginBottom: 5 }}>The Word Was</h2>
-        <h1 style={{ fontSize: 36, color: 'var(--primary)', marginBottom: 20 }}>{state.round.word}</h1>
+        <h1 style={{ fontSize: 36, marginBottom: 20 }}>
+          <span style={{ backgroundColor: 'var(--primary)', color: '#000', padding: '4px 16px', borderRadius: '12px', display: 'inline-block' }}>
+            {state.round.word}
+          </span>
+        </h1>
         
         <h3 style={{ color: 'var(--text-secondary)' }}>
           The Impostor{impostors.length > 1 ? 's were' : ' was'}:
