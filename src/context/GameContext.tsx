@@ -187,8 +187,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
           
           if (impostorIds.includes(player.id)) {
             // Impostor scoring
-            if (voteCounts[player.id] === minVotes && voteCounts[player.id] !== maxVotes) {
-               pointsEarned = 2; // Impostor gets 2 points for having the least votes
+            if (voteCounts[player.id] !== maxVotes) {
+               pointsEarned = 2; // Impostor gets 2 points for not being caught
             }
           } else {
             // Crewmate scoring
