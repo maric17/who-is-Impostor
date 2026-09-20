@@ -30,7 +30,11 @@ export function SetupScreen() {
     // 3. Pick impostors
     let impostorIds: string[] = [];
     const playerIds = state.players.map((p) => p.id);
-    const shuffledIds = [...playerIds].sort(() => 0.5 - Math.random());
+    const shuffledIds = [...playerIds];
+    for (let i = shuffledIds.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledIds[i], shuffledIds[j]] = [shuffledIds[j], shuffledIds[i]];
+    }
     impostorIds = shuffledIds.slice(0, state.settings.impostorCount);
 
     startGame(randomWord, category.name, impostorIds);

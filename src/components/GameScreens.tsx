@@ -36,6 +36,7 @@ export function DiscussionScreen() {
 
 export function VotingScreen() {
   const { state, submitVote, finishVoting } = useGame();
+  const [selectedVotes, setSelectedVotes] = useState<string[]>([]);
   
   if (!state.round) return null;
 
@@ -58,41 +59,72 @@ export function VotingScreen() {
   }
 
   const currentVoter = voters[currentVoterIndex];
+  const allowedVotes = state.settings.mode === 'classic' ? state.settings.impostorCount : 1;
+
+  const handleVoteToggle = (playerId: string) => {
+    if (selectedVotes.includes(playerId)) {
+      setSelectedVotes(selectedVotes.filter(id => id !== playerId));
+    } else {
+      if (selectedVotes.length < allowedVotes) {
+        setSelectedVotes([...selectedVotes, playerId]);
+      }
+    }
+  };
+
+  const handleConfirmVote = () => {
+    if (selectedVotes.length === allowedVotes) {
+      submitVote(currentVoter.id, selectedVotes);
+      setSelectedVotes([]);
+    }
+  };
 
   return (
     <div className="animate-fade-in" style={{ padding: '20px', paddingBottom: 100 }}>
       <div style={{ textAlign: 'center', marginBottom: 30 }}>
         <h2 style={{ fontSize: 24, marginBottom: 10 }}>Vote for the Impostor</h2>
         <p style={{ color: 'var(--text-secondary)' }}>Pass to <strong>{currentVoter.name}</strong> to vote</p>
+        <p style={{ marginTop: 10, fontWeight: 'bold', color: 'var(--primary)' }}>Select {allowedVotes} player{allowedVotes > 1 ? 's' : ''}</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 15 }}>
         {state.players
           .filter(p => p.id !== currentVoter.id && !state.round?.eliminatedIds.includes(p.id))
-          .map(player => (
-          <button 
-            key={player.id}
-            className="card"
-            style={{ 
-              width: '100%', 
-              textAlign: 'left', 
-              fontSize: 20, 
-              fontWeight: 700, 
-              border: 'none', 
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 15
-            }}
-            onClick={() => submitVote(currentVoter.id, player.id)}
-          >
-            <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--bg-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              👤
-            </div>
-            {player.name}
-          </button>
-        ))}
+          .map(player => {
+            const isSelected = selectedVotes.includes(player.id);
+            return (
+              <button 
+                key={player.id}
+                className={`card ${isSelected ? 'active' : ''}`}
+                style={{ 
+                  width: '100%', 
+                  textAlign: 'left', 
+                  fontSize: 20, 
+                  fontWeight: 700, 
+                  border: isSelected ? '2px solid var(--primary)' : 'none', 
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 15,
+                  backgroundColor: isSelected ? 'rgba(214, 255, 54, 0.1)' : 'var(--card-bg)'
+                }}
+                onClick={() => handleVoteToggle(player.id)}
+              >
+                <div style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'var(--bg-color)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {isSelected ? '✅' : '👤'}
+                </div>
+                {player.name}
+              </button>
+            )
+          })}
       </div>
+
+      {selectedVotes.length === allowedVotes && (
+        <div style={{ position: 'fixed', bottom: 20, left: 20, right: 20, zIndex: 10, display: 'flex', justifyContent: 'center' }}>
+           <button className="btn btn-primary" style={{ maxWidth: 460, width: '100%', boxShadow: '0 8px 30px rgba(214, 255, 54, 0.4)' }} onClick={handleConfirmVote}>
+             CONFIRM VOTE
+           </button>
+        </div>
+      )}
     </div>
   );
 }

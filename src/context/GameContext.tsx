@@ -25,7 +25,7 @@ export type RoundData = {
   word: string;
   impostorIds: string[];
   currentPlayerIndex: number;
-  votes: Record<string, string>; // voterId -> votedPlayerId
+  votes: Record<string, string[]>; // voterId -> array of votedPlayerIds
   eliminatedIds: string[];
   eliminationMessage?: string;
   winners?: 'crew' | 'impostors' | null;
@@ -48,7 +48,7 @@ type GameContextType = {
   nextPlayerReveal: () => void;
   startDiscussion: () => void;
   startVoting: () => void;
-  submitVote: (voterId: string, votedId: string) => void;
+  submitVote: (voterId: string, votedIds: string[]) => void;
   finishVoting: () => void;
   continueEliminationRound: () => void;
   nextRound: () => void;
@@ -139,7 +139,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const submitVote = (voterId: string, votedId: string) => {
+  const submitVote = (voterId: string, votedIds: string[]) => {
     setState((prev) => {
       if (!prev.round) return prev;
       return {
@@ -148,7 +148,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           ...prev.round,
           votes: {
             ...prev.round.votes,
-            [voterId]: votedId,
+            [voterId]: votedIds,
           },
         },
       };
@@ -168,10 +168,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const voteCounts: Record<string, number> = {};
       prev.players.forEach(p => voteCounts[p.id] = 0);
       
-      Object.values(votes).forEach(votedId => {
-        if (voteCounts[votedId] !== undefined) {
-          voteCounts[votedId]++;
-        }
+      Object.values(votes).forEach(votedIds => {
+        votedIds.forEach(votedId => {
+          if (voteCounts[votedId] !== undefined) {
+            voteCounts[votedId]++;
+          }
+        });
       });
 
       const voteValues = Object.values(voteCounts);
@@ -190,10 +192,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
             }
           } else {
             // Crewmate scoring
-            const votedFor = votes[player.id];
-            if (impostorIds.includes(votedFor)) {
-              pointsEarned = 1;
-            }
+            const votedForIds = votes[player.id] || [];
+            votedForIds.forEach(votedForId => {
+              if (impostorIds.includes(votedForId)) {
+                pointsEarned += 1;
+              }
+            });
           }
           
           return {
